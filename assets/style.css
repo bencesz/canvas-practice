@@ -1,0 +1,108 @@
+/* Icons designed by Gregor Cesnar (https://www.flaticon.com/authors/gregor-cresnar) from Flaticon */
+
+*, html, body {
+	padding:0;
+	margin:0;
+	font-size:16px;
+	font-family: sans-serif;
+	box-sizing: border-box;
+}
+body {
+	background: #121212;
+}
+[hidden] {
+    display: none !important;
+}
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-content: stretch;
+	align-items: center;
+	position: absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+}
+.container {
+    position: relative;
+    border: double 3px #ffffff;
+    display: flex;
+    justify-content: center;
+}
+.controls {
+    position: absolute;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+}
+canvas {
+    cursor: pointer;
+    outline: none !important;
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+}
+canvas:focus {
+
+}
+svg.icon {
+    width: 1.3rem;
+    height: 1.3rem;
+    line-height: 1.3rem;
+}
+svg > symbol > path {
+    fill: #ffffff
+}
+.btn {
+    display: block;
+	border:none;
+    position: relative;
+	padding: .5rem;
+	font-size: 1.3rem;
+    line-height: 1.3rem;
+	color: #fff;
+	text-align: center;
+	cursor: pointer;
+	text-transform: uppercase;
+    -webkit-transition: all .5s ease;
+	transition: all .5s ease;
+    outline: none !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    overflow: hidden;
+}
+.btn:hover,
+.btn:active,
+.btn:focus {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+}
+
+.btn-start {
+    display: none;
+    border-bottom: solid 2px #a80000;
+    position: absolute;
+    top: 60%;
+    background: #e83300;
+    padding: .5rem 1rem;
+}
+.btn-mute {
+    position: relative;
+    background: transparent;
+}
+.btn-mute.muted::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    background: #e83300;
+    height: 2px;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
