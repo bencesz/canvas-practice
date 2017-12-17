@@ -72,24 +72,31 @@
 </div>
     <div class="wrapper">
         <div class="container" id="game-container">
-            <div class="controls" id="game-controls">
-                <button class="btn btn-action" id="btn-restart" onclick="restartGame()">
-                    <svg class="icon"><use xlink:href="#restart" /></svg>
-                </button>
-                <button class="btn btn-action" id="btn-pause">
-                    <svg class="icon"><use xlink:href="#pause" /></svg>
-                </button>
-                <button class="btn btn-action" id="btn-resume" onclick="resumeGame()">
-                    <svg class="icon"><use xlink:href="#play" /></svg>
-                </button>
-                <button class="btn btn-action btn-mute" id="btn-mute-music" onclick="toggleMusic()">
-                    <svg class="icon"><use xlink:href="#music" /></svg>
-                </button>
-                <button class="btn btn-action btn-mute" id="btn-mute-sfx" onclick="toggleSfx()">
-                    <svg class="icon"><use xlink:href="#sound" /></svg>
-                </button>
+            <div class="game-header">
+                <div class="game-info">
+                    <div id="copyright" class="copyright">
+                        &copy; <a id="author" target="_blank" href="#">(author)</a> <span id="date">(date)</span> - v<span id="version">0.0.0</span>
+                    </div>
+                </div>
+                <div class="controls" id="game-controls">
+                    <button class="btn btn-action" id="btn-restart" onclick="restartGame()">
+                        <svg class="icon"><use xlink:href="#restart" /></svg>
+                    </button>
+                    <button class="btn btn-action" id="btn-pause">
+                        <svg class="icon"><use xlink:href="#pause" /></svg>
+                    </button>
+                    <button class="btn btn-action" id="btn-resume" onclick="resumeGame()">
+                        <svg class="icon"><use xlink:href="#play" /></svg>
+                    </button>
+                    <button class="btn btn-action btn-mute" id="btn-mute-music" onclick="toggleMusic()">
+                        <svg class="icon"><use xlink:href="#music" /></svg>
+                    </button>
+                    <button class="btn btn-action btn-mute" id="btn-mute-sfx" onclick="toggleSfx()">
+                        <svg class="icon"><use xlink:href="#sound" /></svg>
+                    </button>
+                </div>
             </div>
-            <div id="start-screen" class="game-screen">
+            <div id="start-screen" class="game-screen screen-faded">
                 <div class="keys">
                     <div class="key"><div class="btn-action"><svg class="icon"><use xlink:href="#restart" /></svg></div><span class="binding">R</span></div>
                     <div class="key"><div class="btn-action"><svg class="icon"><use xlink:href="#pause" /></svg></div><span class="binding">P</span></div>
@@ -113,14 +120,14 @@
                     <h5>Best Time Bonus: <strong id="play-best-time">0</strong></h5>
                 </div>
             </div>
-            <div id="pause-screen" class="game-screen">
+            <div id="pause-screen" class="game-screen screen-faded">
                 <h1 id="play-title">Paused</h1>
                 <button class="btn btn-main" onclick="resumeGame()">Resume <svg class="icon"><use xlink:href="#play" /></svg></button>
             </div>
-            <div id="end-screen" class="game-screen">
+            <div id="end-screen" class="game-screen screen-faded">
                 <h1 id="end-title-win" class="status-text text-success">You win</h1>
                 <h1 id="end-title-lose" class="status-text text-danger">Game Over</h1>
-                <h2>Score: <span id="end-score" class="text-success">0</span></h2>
+                <h2 class="text-success">Score: <span id="end-score">0</span></h2>
                 <br/>
                 <h3>Hits: <span id="end-hits">0</span></h3>
                 <h3>Time bonus: <span id="end-time">0</span></h3>
@@ -128,12 +135,11 @@
                 <h5>High Score: <strong id="end-high-score">0</strong></h5>
                 <h5>Most Hits: <strong id="end-best-hits">0</strong></h5>
                 <h5>Best Time Bonus: <strong id="end-best-time">0</strong></h5>
-                <button class="btn btn-main" onclick="restartGame()"><svg class="icon"><use xlink:href="#restart" /></svg> Restart</button>
+                <button class="btn btn-main" onclick="restartGame()">Restart <svg class="icon"><use xlink:href="#restart" /></svg></button>
             </div>
-            <h5 class="version">v<span id="version">0.0.1</span></h5>
-            <div class="canvas" id="game" ></div>
+
+            <div id="game" class="canvas"></div>
         </div>
-        <div id="copyright" class="copyright">&copy; <a id="author" target="_blank" href="#">(author)</a> <span id="date">(date)</span></div>
     </div>
     <script type="text/javascript" src="engine.js"></script>
 </body>

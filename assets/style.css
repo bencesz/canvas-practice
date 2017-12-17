@@ -5,7 +5,6 @@
 /*    https://github.com/bencesz/canvas-practice    */
 /* ------------------------------------------------ */
 
-
 * {
     box-sizing: border-box;
 }
@@ -17,21 +16,22 @@ html, body {
 }
 body {
 	background: #121212;
-    color: #444;
+    color: #fff;
 }
 a,
 a:link {
-    color: #444;
+    color: #fff;
     text-decoration: none;
+    border-bottom: dotted 1px #d6d6d6;
 }
 a:hover,
 a:active,
 a:focus {
-    color: #666;
-    border-bottom: dotted 1px #444;
+    color: #d6d6d6;
+    border-bottom: dotted 1px #fff;
 }
 h1 {
-    font-size: 1.5rem;
+    font-size: 2rem;
     line-height: 1.2;
     margin-bottom: 1rem;
     margin-top: auto;
@@ -69,11 +69,7 @@ h5 {
     color: #00aa00;
 }
 .wrapper {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-content: stretch;
-	align-items: center;
+	display: block;
 	position: absolute;
 	top:0;
 	right:0;
@@ -82,13 +78,22 @@ h5 {
 }
 .container {
     position: relative;
-    border: double 3px #ffffff;
+}
+.game-header {
+    position: absolute;
     display: flex;
-    justify-content: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 .5rem 0 1rem;
+    background: rgba(0,0,0,.2);
+}
+.game-info {
+    opacity: .3;
 }
 .controls {
-    position: absolute;
-    right: 0;
     z-index: 2;
     display: flex;
     justify-content: flex-end;
@@ -103,12 +108,18 @@ h5 {
     color: #fff;
     height: 100%;
     width: 100%;
+    text-shadow: 0 0 1.5rem rgba(0,0,0,.6);
 }
 .play-text {
     display: flex;
     justify-content: space-around;
     justify-self: flex-end;
     margin-top: auto;
+    padding: .5rem 1rem;
+    background: rgba(0,0,0,.2);
+}
+.play-text h5 {
+    margin-bottom: 0;
 }
 canvas {
     cursor: pointer;
@@ -117,6 +128,11 @@ canvas {
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: optimize-contrast;
+    background: transparent url(images/level1.jpg) center center repeat;
+    background-size: cover;
+    height: 100vh;
+    width: 100vw;
+    display: block;
 }
 canvas:focus {
 
@@ -148,6 +164,7 @@ svg > symbol > path {
     -webkit-box-shadow: none !important;
     box-shadow: none !important;
     overflow: hidden;
+    -webkit-appearance: button;
 }
 .btn:hover,
 .btn:active,
@@ -160,13 +177,20 @@ svg > symbol > path {
     margin: 2rem auto auto auto;
     border-bottom: solid 2px #a80000;
     background: #e83300;
-    padding: 1rem 4rem;
+    padding: 1rem;
+    width: 25%;
+    text-shadow: 0 -1px 0 #a80000;
+    border-radius: 2rem;
+    pointer-events: auto;
+}
+.btn-main .icon {
+    float: right;
 }
 .btn-action {
     position: relative;
     background: transparent;
 }
-.btn-mute.muted::before {
+.btn-mute.muted:before {
     content: '';
     position: absolute;
     top: 0;
@@ -186,7 +210,6 @@ svg > symbol > path {
 }
 .key {
     text-align: center;
-    color: #666;
 }
 .key .btn-action {
     padding: 1rem;
@@ -204,19 +227,6 @@ svg > symbol > path {
     justify-content: center;
     border-radius: .25rem;
 }
-.version {
-    position: absolute;
-    color: #666;
-    left: .5rem;
-    top: .5rem;
-}
-.copyright {
-    margin-top: .5rem;
-    font-size: .875rem;
-}
-.copyright span {
-    font-size: inherit;
-}
 
 /* INITIAL STATE */
 #btn-restart,
@@ -227,6 +237,12 @@ svg > symbol > path {
 .status-text {
     display: none;
 }
-#play-screen {
+#play-screen,
+#end-screen,
+#pause-screen,
+.version {
     pointer-events: none;
+}
+.screen-faded {
+    background: rgba(0,0,0,.5);
 }

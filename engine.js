@@ -23,9 +23,11 @@
 //1.0.8 - start screen
 //1.0.9 - text refactoring
 
-//TODO 1.1.0 - levels
-//TODO 1.1.1 - local storage
-//TODO 1.1.2 - images
+//1.1.0 - full screen
+//1.1.1 - aesthetic update
+//TODO 1.1.2 - local storage
+//TODO 1.1.3 - images
+//TODO 1.1.4 - levels
 
 //TODO 1.2.0 - settings: difficulty
 //TODO 1.2.1 - settings: key bindings
@@ -39,7 +41,7 @@
 var config = {},
     Config = function() {
         // Game info
-        this.version = '1.0.9';
+        this.version = '1.1.1';
         this.author = 'Bence Szegvári';
         this.date = '2017';
         this.url = 'https://github.com/bencesz/canvas-practice';
@@ -97,7 +99,8 @@ var config = {},
                 image: 'assets/images/level1.jpg',
                 color: '#222222',
                 stroke: '#000000',
-                speed: -0.1
+                speedY: -0.1,
+                speedX: 0.1
             },
 
             keyBindings: {
@@ -245,7 +248,7 @@ function Game() {
         config.playBestTime.innerText = config.settings.score.bestTime.toString();
         config.playHighScore.innerText = config.settings.score.highScore.toString();
         this.resume();
-        this.interval = setInterval(updateGame, config.settings.game.speed);
+        this.speed = setInterval(updateGame, config.settings.game.speed);
         this.timeCounter = setInterval(function(){
             if(config.game.paused || config.game.end) return;
             config.game.time--;
@@ -283,9 +286,6 @@ function Game() {
         if(config.debugging) { console.log('%cGame state: %cended',config.settings.debugging.state, config.settings.debugging.event) }
         this.end = true;
         clearInterval(this.timeCounter);
-        clearInterval(this.interval);
-        this.clear();
-        config.background.update();
 
         if(config.game.enemies === 0) {
             config.endTitleLose.style.display = 'none';
@@ -315,11 +315,12 @@ function Game() {
         config.endBestTime.innerText = config.settings.score.bestTime.toString();
         config.endHighScore.innerText = config.settings.score.highScore.toString();
 
+        config.playScreen.style.display = 'none';
         config.endScreen.style.display = 'flex';
     };
 }
 
-function Component(width, height, fill, x, y, type, align) {
+function Component(width, height, fill, x, y, type, align, enemy) {
     this.type = type;
     this.width = width;
     this.height = height;
@@ -332,6 +333,7 @@ function Component(width, height, fill, x, y, type, align) {
     this.textAlign = align;
     this.alive = true;
     this.lineWidth = 1;
+    this.enemy = enemy;
 
     this.update = function() {
         var ctx = config.game.context;
@@ -342,8 +344,8 @@ function Component(width, height, fill, x, y, type, align) {
                 this.image.src = this.fill;
                 ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
                 ctx.lineWidth = this.lineWidth;
-                if (this.type === 'background' && config.settings.background.speed !== 0) {
-                    var positionY = (config.settings.background.speed > 0) ? this.y + this.height : this.y - this.height;
+                if (this.type === 'background' && config.settings.background.speedY !== 0) {
+                    var positionY = (config.settings.background.speedY > 0) ? this.y + this.height : this.y - this.height;
                     ctx.drawImage(this.image, this.x, positionY, this.width, this.height);
                 }
                 break;
@@ -396,6 +398,7 @@ function Component(width, height, fill, x, y, type, align) {
     };
 
     this.explode = function(x, y){
+        config.sfx.collide.play();
         this.x = x;
         this.y = y;
         this.width = 0;
@@ -406,10 +409,10 @@ function Component(width, height, fill, x, y, type, align) {
     this.move = function() {
         this.x += this.speedX * (this.speedIncrease);
         this.y += this.speedY;
-        if (this.type === 'background' && config.settings.background.speed !== 0) {
-            if (config.settings.background.speed > 0 && this.y >= config.game.y) {
+        if (this.type === 'background' && config.settings.background.speedY !== 0) {
+            if (config.settings.background.speedY > 0 && this.y >= config.game.y) {
                 this.y = -(this.height);
-            } else if (config.settings.background.speed < 0 && this.y <= config.game.y) {
+            } else if (config.settings.background.speedY < 0 && this.y <= config.game.y) {
                 this.y = this.height;
             }
         }
@@ -432,7 +435,8 @@ function Component(width, height, fill, x, y, type, align) {
             collision = false;
         }
         if(collision && this.alive && object.alive) {
-            config.sfx.collide.play();
+            config.explosion.explode(object.x + (object.width/2), object.y + (object.width/2));
+            object.destroy(object.enemy);
             if(config.debugging) { console.log('%c%s %ccollided with %c%s', config.settings.debugging.object, this.type, config.settings.debugging.event, config.settings.debugging.object, object.type) }
         }
         return collision;
@@ -618,6 +622,7 @@ function startGame() {
 function restartGame() {
     config.game.stop();
     config.game.clear();
+    clearInterval(config.game.speed);
     config.game = {};
     config.player = {};
     config.enemies = [];
@@ -641,9 +646,11 @@ function restartGame() {
 function updateGame() {
     config.game.clear();
 
-    if (config.game.enemies === 0 || config.bomb.collideWith(config.player)) {
+    if (config.game.enemies === 0 && !config.game.end || config.bomb.collideWith(config.player)) {
+        if(config.bomb.collideWith(config.player)) {
+            config.player.destroy(false);
+        }
         config.game.stop();
-        return;
     }
 
     if (config.game.paused) {
@@ -652,38 +659,18 @@ function updateGame() {
         if (config.game.keys) {
             gameControls();
         }
-    } else {
+    }
+    else {
         config.game.frameCount += 1;
 
         config.background.speedX = 0;
-        config.settings.background.speed !== 0 ? config.background.speedY = config.settings.background.speed : config.background.speedY = 0;
+        config.settings.background.speedY !== 0 ? config.background.speedY = config.settings.background.speedY : config.background.speedY = 0;
 
         config.player.speedX = 0;
         config.player.speedY = 0;
 
         if (config.game.keys) {
-            if (config.game.keys[config.settings.keyBindings.left] && config.player.x > config.game.x) {
-                config.player.speedX = -config.settings.player.speed;
-                config.background.speedX = (config.settings.background.speed > 0) ? config.settings.background.speed : -config.settings.background.speed;
-            }
-            if (config.game.keys[config.settings.keyBindings.right] && config.player.x + (config.settings.player.width) < config.settings.game.width) {
-                config.player.speedX = config.settings.player.speed;
-                config.background.speedX = -config.settings.background.speed;
-                config.background.speedX = (config.settings.background.speed > 0) ? -config.settings.background.speed : config.settings.background.speed;
-            }
-            if (config.settings.player.axisY) {
-                if (config.game.keys[config.settings.keyBindings.down] && config.player.y + (config.settings.player.height) < config.settings.game.height) {
-                    config.player.speedY = config.settings.player.speed;
-                    config.background.speedY = (config.settings.background.speed > 0) ? -config.settings.background.speed : config.settings.background.speed;
-                }
-                if (config.game.keys[config.settings.keyBindings.up] && config.player.y > config.game.y) {
-                    config.player.speedY = -config.settings.player.speed;
-                    config.background.speedY = (config.settings.background.speed > 0) ? config.settings.background.speed : -config.settings.background.speed;
-                }
-            }
-            if (config.game.keys[config.settings.keyBindings.shoot]) {
-                shoot(config.player);
-            }
+            playerControls();
             gameControls();
         }
 
@@ -719,18 +706,31 @@ function updateGame() {
 
             if (config.enemies[enemy] && config.enemies[enemy].alive) {
 
-                if (config.player.collideWith(config.enemies[enemy]) || config.enemies[enemy].y + (config.enemies[enemy].height) > config.settings.game.height) {
-                    config.explosion.explode(config.player.x + config.player.width/2, config.player.y + config.player.height/2);
-                    config.game.stop();
-                    return;
+                if (config.enemies[enemy].collideWith(config.player)) {
+                    config.enemies[enemy].destroy(true);
+                    config.player.destroy(false);
+                    config.game.enemies--;
+                    if(config.debugging) { console.log('%cEnemies left: ', config.settings.debugging.passive, config.game.enemies) }
+                    if(!config.game.end) {
+                        config.game.stop();
+                        return;
+                    }
                 }
-                if (config.bullet.collideWith(config.enemies[enemy])) {
-                    config.game.score += config.settings.enemy.point;
-                    config.explosion.explode(config.enemies[enemy].x + config.enemies[enemy].width/2, config.enemies[enemy].y + config.enemies[enemy].height/2);
+                if(config.enemies[enemy].y + (config.enemies[enemy].height) > config.settings.game.height) {
                     config.enemies[enemy].destroy(true);
                     config.game.enemies--;
                     if(config.debugging) { console.log('%cEnemies left: ', config.settings.debugging.passive, config.game.enemies) }
+                    if(!config.game.end) {
+                        config.game.stop();
+                        return;
+                    }
+                }
+                if (config.bullet.collideWith(config.enemies[enemy])) {
+                    config.game.score += config.settings.enemy.point;
+                    config.enemies[enemy].destroy(true);
                     config.bullet.destroy(false);
+                    config.game.enemies--;
+                    if(config.debugging) { console.log('%cEnemies left: ', config.settings.debugging.passive, config.game.enemies) }
                 }
 
                 if (enemySpeedUp) {
@@ -758,10 +758,9 @@ function updateGame() {
             config.bomb.destroy(true);
         }
 
-        if (config.bomb.collideWith(config.bullet)) {
+        if (config.bullet.collideWith(config.bomb)) {
             if(config.bullet.alive && config.bomb.alive) {
                 config.game.score += config.settings.bomb.point;
-                config.explosion.explode(config.bomb.x + config.bomb.width/2, config.bomb.y + config.bomb.height/2);
                 config.bullet.destroy(false);
                 config.bomb.destroy(true);
             }
@@ -772,9 +771,11 @@ function updateGame() {
 
         config.explosion.update();
 
-        config.playHits.innerText = config.game.score.toString();
-        config.playTime.innerText = config.game.time.toString();
-        config.playScore.innerText = (config.game.score + config.game.time).toString();
+        if(!config.game.end){
+            config.playHits.innerText = config.game.score.toString();
+            config.playTime.innerText = config.game.time.toString();
+            config.playScore.innerText = (config.game.score + config.game.time).toString();
+        }
     }
 }
 
@@ -812,6 +813,7 @@ function toggleSfx() {
         if(config.debugging) { console.log('%cSFX: %cmuted', config.settings.debugging.state, config.settings.debugging.event) }
     }
     config.settings.sfx.mute = !config.settings.sfx.mute;
+    if(!config.game.paused)
     config.game.canvas.focus();
 }
 
@@ -868,5 +870,30 @@ function gameControls() {
         setTimeout(function() {
             config.game.actions.restarting = false;
         },300);
+    }
+}
+
+function playerControls() {
+    if (config.game.keys[config.settings.keyBindings.left] && config.player.x > config.game.x) {
+        config.player.speedX = -config.settings.player.speed;
+        config.background.speedX = (config.settings.background.speedX > 0) ? config.settings.background.speedX : -config.settings.background.speedX;
+    }
+    if (config.game.keys[config.settings.keyBindings.right] && config.player.x + (config.settings.player.width) < config.settings.game.width) {
+        config.player.speedX = config.settings.player.speed;
+        config.background.speedX = -config.settings.background.speedX;
+        config.background.speedX = (config.settings.background.speedX > 0) ? -config.settings.background.speedX : config.settings.background.speedX;
+    }
+    if (config.settings.player.axisY) {
+        if (config.game.keys[config.settings.keyBindings.down] && config.player.y + (config.settings.player.height) < config.settings.game.height) {
+            config.player.speedY = config.settings.player.speed;
+            config.background.speedY = (config.settings.background.speedY > 0) ? -config.settings.background.speedY : config.settings.background.speedY;
+        }
+        if (config.game.keys[config.settings.keyBindings.up] && config.player.y > config.game.y) {
+            config.player.speedY = -config.settings.player.speed;
+            config.background.speedY = (config.settings.background.speedY > 0) ? config.settings.background.speedY : -config.settings.background.speedY;
+        }
+    }
+    if (config.game.keys[config.settings.keyBindings.shoot]) {
+        shoot(config.player);
     }
 }
