@@ -1,17 +1,72 @@
-/* Icons designed by Gregor Cesnar (https://www.flaticon.com/authors/gregor-cresnar) from Flaticon */
+@charset "utf-8";
+/* ------------------------------------------------ */
+/*    CANVAS PRACTICE                               */
+/*    by Bence Szegvári                             */
+/*    https://github.com/bencesz/canvas-practice    */
+/* ------------------------------------------------ */
 
-*, html, body {
+
+* {
+    box-sizing: border-box;
+}
+html, body {
 	padding:0;
 	margin:0;
 	font-size:16px;
 	font-family: sans-serif;
-	box-sizing: border-box;
 }
 body {
 	background: #121212;
+    color: #444;
+}
+a,
+a:link {
+    color: #444;
+    text-decoration: none;
+}
+a:hover,
+a:active,
+a:focus {
+    color: #666;
+    border-bottom: dotted 1px #444;
+}
+h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    margin-top: auto;
+    text-transform: uppercase;
+    font-weight: normal;
+}
+h2,h3,h4,h5 {
+    margin-top: 0;
+}
+h2 {
+    font-size: 1.3rem;
+    line-height: 1.2;
+    margin-bottom: .875rem;
+}
+h3 {
+    font-size: 1.1rem;
+    line-height: 1.2;
+    margin-bottom: .5rem;
+}
+h4, h5 {
+    font-size: 1rem;
+    line-height: 1.2;
+    margin-bottom: .5rem;
+}
+h5 {
+    font-weight: normal;
 }
 [hidden] {
     display: none !important;
+}
+.text-danger {
+    color: #e83300;
+}
+.text-success {
+    color: #00aa00;
 }
 .wrapper {
 	display: flex;
@@ -34,8 +89,26 @@ body {
 .controls {
     position: absolute;
     right: 0;
+    z-index: 2;
     display: flex;
     justify-content: flex-end;
+}
+.game-screen {
+    position: absolute;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    color: #fff;
+    height: 100%;
+    width: 100%;
+}
+.play-text {
+    display: flex;
+    justify-content: space-around;
+    justify-self: flex-end;
+    margin-top: auto;
 }
 canvas {
     cursor: pointer;
@@ -48,7 +121,9 @@ canvas {
 canvas:focus {
 
 }
-svg.icon {
+.icon {
+    display: inline-block;
+    vertical-align: bottom;
     width: 1.3rem;
     height: 1.3rem;
     line-height: 1.3rem;
@@ -80,16 +155,14 @@ svg > symbol > path {
     -webkit-transform: scale(1.1);
     transform: scale(1.1);
 }
-
-.btn-start {
-    display: none;
+.btn-main {
+    display: block;
+    margin: 2rem auto auto auto;
     border-bottom: solid 2px #a80000;
-    position: absolute;
-    top: 60%;
     background: #e83300;
-    padding: .5rem 1rem;
+    padding: 1rem 4rem;
 }
-.btn-mute {
+.btn-action {
     position: relative;
     background: transparent;
 }
@@ -105,4 +178,55 @@ svg > symbol > path {
     height: 2px;
     -webkit-transform: rotate(-45deg);
     transform: rotate(-45deg);
+}
+.keys {
+    display:flex;
+    justify-content: center;
+    margin: auto;
+}
+.key {
+    text-align: center;
+    color: #666;
+}
+.key .btn-action {
+    padding: 1rem;
+}
+.arrow {
+    display: flex;
+    color: #fff;
+    background: transparent;
+    width: 4rem;
+    height: 4rem;
+    margin: auto .5rem .5rem;
+    border: solid 1px #fff;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    border-radius: .25rem;
+}
+.version {
+    position: absolute;
+    color: #666;
+    left: .5rem;
+    top: .5rem;
+}
+.copyright {
+    margin-top: .5rem;
+    font-size: .875rem;
+}
+.copyright span {
+    font-size: inherit;
+}
+
+/* INITIAL STATE */
+#btn-restart,
+#btn-resume,
+#play-screen,
+#pause-screen,
+#end-screen,
+.status-text {
+    display: none;
+}
+#play-screen {
+    pointer-events: none;
 }
